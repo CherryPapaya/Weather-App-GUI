@@ -2,6 +2,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -49,7 +50,29 @@ public class WeatherApp {
 
                 // get index of current hour to extract that hour's data
                 JSONArray time = (JSONArray) hourly.get("time");
-                int index = findIndexOfCurrentTime(time);
+//                int index = findIndexOfCurrentTime(time);
+                int index = 0;
+
+                // JSONObject to store all the data
+                JSONObject weatherData = new JSONObject();
+
+                // array to recursively extract the data
+                String[] weatherFactors = {"temperature_2m", "weather_code", "wind_speed_10m", "relative_humidity_2m"};
+
+                // extract data from each weather factor and place into JSON Object
+                for (String weatherFactor : weatherFactors) {
+                    JSONArray weatherFactorArray = (JSONArray) hourly.get(weatherFactor);
+
+                    if (String.valueOf(weatherFactorArray.get(index)).contains(".")) {
+                        double weatherFactorValue = (double) weatherFactorArray.get(index);
+                        weatherData.put(weatherFactor, weatherFactorValue);
+                    } else {
+                        long weatherFactorValue = (long) weatherFactorArray.get(index);
+                        weatherData.put(weatherFactor, weatherFactorValue);
+                    }
+                }
+
+                return weatherData;
             }
 
         } catch (Exception e) {
@@ -135,10 +158,10 @@ public class WeatherApp {
 
         int index = 0;
         for (Object time : timeList) {
-            if (!String.valueOf(time).equals(currentTime)) {
-                index++;
-            } else {
+            if (String.valueOf(time).equals(currentTime)) {
                 return index;
+            } else {
+                index++;
             }
         }
         return -1;
