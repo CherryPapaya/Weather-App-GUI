@@ -8,10 +8,14 @@ import java.util.Scanner;
 
 // retrieve latest weather data from external API which will be displayed by the GUI to the user.
 public class WeatherApp {
-    // fetch weather date for searched location
+    // fetch weather data for searched location
     public static JSONObject getWeatherData(String locationName) {
         // get location using the geolocation API
         JSONArray locationData = getLocationData(locationName);
+
+        JSONObject location = (JSONObject) locationData.get(0);
+        double latitude = (double) location.get("latitude");
+        double longitude = (double) location.get("longitude");
 
         return null;
 

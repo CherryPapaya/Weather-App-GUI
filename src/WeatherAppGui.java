@@ -19,7 +19,7 @@ public class WeatherAppGui extends JFrame {
         // load the GUI to the center of the screen
         setLocationRelativeTo(null);
 
-        // make layout manager null to manually position the component in the GUI
+        // make layout manager null to manually position the components in the GUI
         setLayout(null);
 
         // prevent resize of GUI
@@ -78,7 +78,7 @@ public class WeatherAppGui extends JFrame {
         humidityText.setFont(new Font("Dialog", Font.PLAIN, 16));
         add(humidityText);
 
-        // windspeed iamge
+        // windspeed image
         JLabel windspeedImage = new JLabel(loadImage("src/assets/windspeed.png"));
         windspeedImage.setBounds(220, 500, 74, 66);
         add(windspeedImage);
