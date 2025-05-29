@@ -144,14 +144,15 @@ public class WeatherApp {
         return -1;
     }
 
-    private static String getCurrentTime() {
+    public static String getCurrentTime() {
         // get current date and time
         LocalDateTime currentDateTime = LocalDateTime.now();
 
+        // making the format of currentDateTime identical to the API's format
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH':00'");
+        String formattedDateTime = currentDateTime.format(formatter);
 
-        String dateTimeString = String.valueOf(currentDateTime);
-        return dateTimeString;
+        return formattedDateTime;
 
     }
 }
