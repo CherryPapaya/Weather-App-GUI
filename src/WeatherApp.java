@@ -13,9 +13,37 @@ public class WeatherApp {
         // get location using the geolocation API
         JSONArray locationData = getLocationData(locationName);
 
+        // extract latitude and longitude data
         JSONObject location = (JSONObject) locationData.get(0);
         double latitude = (double) location.get("latitude");
         double longitude = (double) location.get("longitude");
+
+        // build API request URL with location coordinates
+        String urlString = "https://api.open-meteo.com/v1/forecast?" +
+                "latitude=" + latitude + "&longitude=" + longitude +
+                "&hourly=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m&timezone=Europe%2FBerlin";
+
+        try {
+            HttpURLConnection conn = fetchApiResponse(urlString);
+
+            if (conn.getResponseCode() != 200) {
+                System.out.println("Error: Could not connect to API");
+                return null;
+            } else {
+                StringBuilder resultsJson = new StringBuilder();
+                Scanner scanner = new Scanner(conn.getInputStream());
+
+                while (scanner.hasNext()) {
+                    resultsJson.append(scanner.nextLine());
+                }
+
+                scanner.close();
+                conn.disconnect();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return null;
 
