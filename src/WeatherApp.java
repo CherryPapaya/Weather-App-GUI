@@ -4,6 +4,7 @@ import org.json.simple.parser.JSONParser;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 // retrieve latest weather data from external API which will be displayed by the GUI to the user.
@@ -21,7 +22,7 @@ public class WeatherApp {
         // build API request URL with location coordinates
         String urlString = "https://api.open-meteo.com/v1/forecast?" +
                 "latitude=" + latitude + "&longitude=" + longitude +
-                "&hourly=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m&timezone=Europe%2FBerlin";
+                "&hourly=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m&timezone=Africa%2FCairo";
 
         try {
             HttpURLConnection conn = fetchApiResponse(urlString);
@@ -39,6 +40,15 @@ public class WeatherApp {
 
                 scanner.close();
                 conn.disconnect();
+
+                JSONParser parser = new JSONParser();
+                JSONObject resultsJsonObj = (JSONObject) parser.parse(String.valueOf(resultsJson));
+
+                JSONObject hourly = (JSONObject) resultsJsonObj.get("hourly");
+
+                // get index of current hour to extract that hour's data
+                JSONArray time = (JSONArray) hourly.get("time");
+                int index = findIndexOfCurrentTime(time);
             }
 
         } catch (Exception e) {
@@ -99,7 +109,7 @@ public class WeatherApp {
         return null;
     }
 
-    public static HttpURLConnection fetchApiResponse(String urlString) {
+    private static HttpURLConnection fetchApiResponse(String urlString) {
         try {
             // attempt to create a connection
             URL url = new URL(urlString);
@@ -117,5 +127,27 @@ public class WeatherApp {
 
         // failed to create connection
         return null;
+    }
+
+    private static int findIndexOfCurrentTime(JSONArray timeList) {
+        String currentTime = getCurrentTime();
+
+        int index = 0;
+        for (Object time : timeList) {
+            if (!String.valueOf(time).equals(currentTime)) {
+                index++;
+            } else {
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    private static String getCurrentTime() {
+        // get current date and time
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        String dateTimeString = String.valueOf(currentDateTime);
+        return dateTimeString;
+
     }
 }
