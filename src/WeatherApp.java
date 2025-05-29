@@ -53,24 +53,41 @@ public class WeatherApp {
 //                int index = findIndexOfCurrentTime(time);
                 int index = 0;
 
+//                // array to recursively extract the data
+//                String[] weatherFactors = {"temperature_2m", "weather_code", "wind_speed_10m", "relative_humidity_2m"};
+//
+//                // extract data from each weather factor and place into JSON Object
+//                for (String weatherFactor : weatherFactors) {
+//                    JSONArray weatherFactorArray = (JSONArray) hourly.get(weatherFactor);
+//
+//                    if (String.valueOf(weatherFactorArray.get(index)).contains(".")) {
+//                        double weatherFactorValue = (double) weatherFactorArray.get(index);
+//                        weatherData.put(weatherFactor, weatherFactorValue);
+//                    } else {
+//                        long weatherFactorValue = (long) weatherFactorArray.get(index);
+//                        weatherData.put(weatherFactor, weatherFactorValue);
+//                    }
+//                }
+
+                // get data for each weather factor
+                JSONArray temperatureData = (JSONArray) hourly.get("temperature_2m");
+                double temperature = (double) temperatureData.get(index);
+
+                JSONArray weatherCode = (JSONArray) hourly.get("weather_code");
+                String weatherCondition = convertWeatherCode((long) weatherCode.get(index));
+
+                JSONArray humidityData = (JSONArray) hourly.get("relative_humidity_2m");
+                long humidity = (long) humidityData.get(index);
+
+                JSONArray windSpeedData = (JSONArray) hourly.get("wind_speed_10m");
+                double windSpeed = (double) windSpeedData.get(index);
+
                 // JSONObject to store all the data
                 JSONObject weatherData = new JSONObject();
-
-                // array to recursively extract the data
-                String[] weatherFactors = {"temperature_2m", "weather_code", "wind_speed_10m", "relative_humidity_2m"};
-
-                // extract data from each weather factor and place into JSON Object
-                for (String weatherFactor : weatherFactors) {
-                    JSONArray weatherFactorArray = (JSONArray) hourly.get(weatherFactor);
-
-                    if (String.valueOf(weatherFactorArray.get(index)).contains(".")) {
-                        double weatherFactorValue = (double) weatherFactorArray.get(index);
-                        weatherData.put(weatherFactor, weatherFactorValue);
-                    } else {
-                        long weatherFactorValue = (long) weatherFactorArray.get(index);
-                        weatherData.put(weatherFactor, weatherFactorValue);
-                    }
-                }
+                weatherData.put("temperature", temperature);
+                weatherData.put("weather_condition", weatherCondition);
+                weatherData.put("humidity", humidity);
+                weatherData.put("wind_speed", windSpeed);
 
                 return weatherData;
             }
@@ -156,18 +173,19 @@ public class WeatherApp {
     private static int findIndexOfCurrentTime(JSONArray timeList) {
         String currentTime = getCurrentTime();
 
-        int index = 0;
-        for (Object time : timeList) {
-            if (String.valueOf(time).equals(currentTime)) {
-                return index;
+        int i = 0;
+        for (Object timeObj : timeList) {
+            String time = (String) timeList.get(i);
+            if (time.equalsIgnoreCase(currentTime)) {
+                return i;
             } else {
-                index++;
+                i++;
             }
         }
         return -1;
     }
 
-    public static String getCurrentTime() {
+    private static String getCurrentTime() {
         // get current date and time
         LocalDateTime currentDateTime = LocalDateTime.now();
 
@@ -176,6 +194,29 @@ public class WeatherApp {
         String formattedDateTime = currentDateTime.format(formatter);
 
         return formattedDateTime;
+
+    }
+
+    // return weather condition based on weather code
+    private static String convertWeatherCode(long weatherCode) {
+        String weatherCondtion = "";
+
+        if (weatherCode == 0L) {
+            weatherCondtion = "Clear Sky";
+        } else if (weatherCode >= 1L && weatherCode <= 3L) {
+            weatherCondtion = "Cloudy";
+        }
+//        else if (weatherCode >= 45L && weatherCode <= 48L) {
+//            weatherCondtion = "Foggy";
+//        }
+        else if (weatherCode >= 51L && weatherCode <= 67L
+                || weatherCode >= 80L && weatherCode <= 99L) {
+            weatherCondtion = "Rain";
+        } else if (weatherCode >= 71L && weatherCode <= 77L) {
+            weatherCondtion = "Snow";
+        }
+
+        return weatherCondtion;
 
     }
 }
