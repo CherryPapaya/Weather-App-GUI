@@ -5,6 +5,7 @@ import org.json.simple.parser.JSONParser;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 // retrieve latest weather data from external API which will be displayed by the GUI to the user.
@@ -146,6 +147,9 @@ public class WeatherApp {
     private static String getCurrentTime() {
         // get current date and time
         LocalDateTime currentDateTime = LocalDateTime.now();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH':00'");
+
         String dateTimeString = String.valueOf(currentDateTime);
         return dateTimeString;
 
